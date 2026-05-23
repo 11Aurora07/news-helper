@@ -1,0 +1,47 @@
+name: campus-monitor
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Restore monitor state
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: campus-monitor-state-${{ github.ref_name }}
+          restore-keys: |
+            campus-monitor-state-
+
+      - name: Prepare runtime files
+        env:
+          YS_SESSION_COOKIE: ${{ secrets.YS_SESSION_COOKIE }}
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          POLL_INTERVAL_SECONDS: "300"
+        run: |
+          mkdir -p data
+          python tools/build_github_actions_config.py
+
+      - name: Run monitor once
+        run: python main.py --config config.generated.json --once
+
+      - name: Save monitor state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data
+          key: campus-monitor-state-${{ github.ref_name }}-${{ github.run_id }}

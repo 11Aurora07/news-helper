@@ -1,0 +1,10 @@
+config.generated.json
+config.miniprogram.json
+data/
+__pycache__/
+monitor/__pycache__/
+.github/.runtime/
+tmp_saz/
+tmp_saz2/
+*.saz
+*.zip

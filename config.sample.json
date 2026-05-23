@@ -1,0 +1,25 @@
+{
+  "poll_interval_seconds": 30,
+  "keywords": [
+    "电动车",
+    "电瓶车",
+    "雅迪",
+    "爱玛"
+  ],
+  "source": {
+    "type": "sample_json",
+    "path": "data/sample_posts.json"
+  },
+  "notifiers": {
+    "console": true,
+    "windows_popup": false,
+    "webhook": {
+      "enabled": false,
+      "url": "",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  }
+}

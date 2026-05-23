@@ -1,0 +1,15 @@
+[Unit]
+Description=Campus Wall Monitor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/campus-monitor
+ExecStart=/usr/bin/env bash /opt/campus-monitor/deploy/start_monitor.sh
+Restart=always
+RestartSec=10
+User=root
+
+[Install]
+WantedBy=multi-user.target

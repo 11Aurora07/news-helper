@@ -1,0 +1,93 @@
+{
+  "poll_interval_seconds": 20,
+  "keywords": [
+    "电动车",
+    "电瓶车",
+    "电摩",
+    "雅迪",
+    "爱玛",
+    "小牛",
+    "九号",
+    "台铃",
+    "绿源"
+  ],
+  "categories": [
+    "日常投稿",
+    "二手闲置"
+  ],
+  "source": {
+    "type": "http_json",
+    "url": "https://ys.qimiaoyuanfen.com/article/article/lists",
+    "method": "POST",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 MicroMessenger/7.0.20.1781(0x6700143B) NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF WindowsWechat(0x63090a13) UnifiedPCWindowsWechat(0xf2541939) XWEB/19841",
+      "Cookie": "ys7_ysxy_session=replace-me",
+      "xweb_xhr": "1",
+      "Referer": "https://servicewechat.com/wxe23b94e06f71e89a/141/page-frame.html",
+      "Accept": "*/*",
+      "Content-Type": "application/json"
+    },
+    "session_store_path": "data/session.json",
+    "session_cookie_name": "ys7_ysxy_session",
+    "body": {
+      "page": 1,
+      "pageSize": 20
+    },
+    "body_mode": "json",
+    "fail_on_empty": true,
+    "json_path": "data.list",
+    "detail": {
+      "url": "https://ys.qimiaoyuanfen.com/article/article/info",
+      "method": "POST",
+      "body_mode": "json",
+      "body": {
+        "from_type": 1,
+        "id": "{id}"
+      },
+      "json_path": "data",
+      "field_map": {
+        "id": "id",
+        "category": "category_name",
+        "title": "title",
+        "content": "detail",
+        "created_at": "create_time"
+      }
+    },
+    "miniapp_code": {
+      "url": "https://ys.qimiaoyuanfen.com/article/article/getxcxcode",
+      "method": "POST",
+      "body_mode": "json",
+      "body": {
+        "article_id": "{id}"
+      },
+      "json_path": "data",
+      "field": "xcxCode"
+    },
+    "field_map": {
+      "id": "id",
+      "category": "category_name",
+      "title": "title",
+      "content": "detail",
+      "url": "",
+      "created_at": "create_time"
+    }
+  },
+  "notifiers": {
+    "console": true,
+    "windows_popup": true,
+    "pushplus": {
+      "enabled": false,
+      "token": "",
+      "template": "markdown",
+      "topic": ""
+    },
+    "webhook": {
+      "enabled": false,
+      "url": "",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  }
+}
