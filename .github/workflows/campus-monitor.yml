@@ -39,6 +39,16 @@ jobs:
       - name: Run monitor once
         run: python main.py --config config.generated.json --once
 
+      - name: Upload runtime state
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-state
+          path: |
+            data/state.db
+            data/session.json
+          if-no-files-found: ignore
+
       - name: Save monitor state
         if: always()
         uses: actions/cache/save@v4
