@@ -46,6 +46,7 @@ def run_once(config_path: str) -> Dict[str, Any]:
         "category_skipped": 0,
         "keyword_skipped": 0,
         "seen_skipped": 0,
+        "detail_checked": 0,
         "matched_count": 0,
         "matched_post_ids": [],
         "categories": categories,
@@ -57,16 +58,17 @@ def run_once(config_path: str) -> Dict[str, Any]:
             report["category_skipped"] += 1
             continue
 
-        matched = match_keywords(post, keywords)
-        if not matched:
-            report["keyword_skipped"] += 1
-            continue
-
         if store.has_seen(post):
             report["seen_skipped"] += 1
             continue
 
         detailed_post = enrich_post(post, source)
+        report["detail_checked"] += 1
+        matched = match_keywords(detailed_post, keywords)
+        if not matched:
+            report["keyword_skipped"] += 1
+            continue
+
         notify(detailed_post, matched, notifiers)
         store.mark_seen(detailed_post)
         report["matched_count"] += 1
@@ -77,6 +79,7 @@ def run_once(config_path: str) -> Dict[str, Any]:
         f"\u5171\u62c9\u53d6 {report['total_posts']} \u6761\u5e16\u5b50\uff0c"
         f"\u65b0\u589e\u547d\u4e2d {report['matched_count']} \u6761\uff0c"
         f"\u5206\u7c7b\u8fc7\u6ee4 {report['category_skipped']} \u6761\uff0c"
+        f"\u8865\u8be6\u60c5 {report['detail_checked']} \u6761\uff0c"
         f"\u5173\u952e\u8bcd\u672a\u547d\u4e2d {report['keyword_skipped']} \u6761\uff0c"
         f"\u5df2\u901a\u77e5\u8fc7 {report['seen_skipped']} \u6761\u3002"
     )

@@ -117,6 +117,7 @@ d8e523e9629c4d21add0fd60f5a27427
 - `Total posts`
 - `New matches`
 - `Category skipped`
+- `Detail checked`
 - `Keyword skipped`
 - `Seen skipped`
 - `Matched post IDs`
@@ -125,6 +126,8 @@ d8e523e9629c4d21add0fd60f5a27427
 
 - `New matches = 0` 且 `Seen skipped = 0`
   说明这轮没抓到符合条件的新帖
+- `Detail checked > 0` 但 `Keyword skipped` 很高
+  说明列表里有很多候选帖，但补详情后也没出现目标关键词
 - `New matches = 0` 且 `Seen skipped > 0`
   说明这轮抓到了相关帖子，但被判重了
 - `status = error`

@@ -26,6 +26,7 @@ def main() -> None:
     print(f"- Total posts: `{report.get('total_posts', 0)}`")
     print(f"- New matches: `{report.get('matched_count', 0)}`")
     print(f"- Category skipped: `{report.get('category_skipped', 0)}`")
+    print(f"- Detail checked: `{report.get('detail_checked', 0)}`")
     print(f"- Keyword skipped: `{report.get('keyword_skipped', 0)}`")
     print(f"- Seen skipped: `{report.get('seen_skipped', 0)}`")
 

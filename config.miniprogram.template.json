@@ -31,7 +31,7 @@
     "session_cookie_name": "ys7_ysxy_session",
     "body": {
       "page": 1,
-      "pageSize": 20
+      "pageSize": 50
     },
     "body_mode": "json",
     "fail_on_empty": true,
