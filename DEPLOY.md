@@ -38,6 +38,34 @@
   只填 cookie 值本身，不带 `ys7_ysxy_session=`
 - `PUSHPLUS_TOKEN`
 
+### Secrets 填写示例
+
+如果你当前本地请求头里是：
+
+```text
+Cookie: ys7_ysxy_session=efh5t96lcl382uijqcciofth8m7qar12
+```
+
+那么：
+
+- `YS_SESSION_COOKIE` 填 `efh5t96lcl382uijqcciofth8m7qar12`
+- 不要填 `ys7_ysxy_session=efh5t96lcl382uijqcciofth8m7qar12`
+- 不要带 `Cookie:` 前缀
+- 不要加引号
+
+`PUSHPLUS_TOKEN` 就直接填你的 token，例如：
+
+```text
+d8e523e9629c4d21add0fd60f5a27427
+```
+
+### 填错时的典型表现
+
+- `YS_SESSION_COOKIE` 填错：
+  workflow 会报 `HTTP request failed`，或者接口返回空列表
+- `PUSHPLUS_TOKEN` 填错：
+  workflow 本身能跑完，但 PushPlus 返回非 200
+
 ### 工作方式
 
 1. Actions 每 5 分钟触发一次
