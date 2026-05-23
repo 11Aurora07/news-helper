@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import json
+import os
 import sys
 import time
 import traceback
 from pathlib import Path
+from typing import Any, Dict
 
 from monitor.config import load_config
 from monitor.matcher import match_categories, match_keywords
@@ -28,7 +31,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def run_once(config_path: str) -> int:
+def run_once(config_path: str) -> Dict[str, Any]:
     config = load_config(config_path)
     store = SeenStore("data/state.db")
     keywords = config["keywords"]
@@ -37,26 +40,64 @@ def run_once(config_path: str) -> int:
     notifiers = config.get("notifiers", {})
 
     posts = fetch_posts(source)
-    hit_count = 0
+    report: Dict[str, Any] = {
+        "config_path": config_path,
+        "total_posts": len(posts),
+        "category_skipped": 0,
+        "keyword_skipped": 0,
+        "seen_skipped": 0,
+        "matched_count": 0,
+        "matched_post_ids": [],
+        "categories": categories,
+        "keywords": keywords,
+    }
 
     for post in posts:
         if not match_categories(post, categories):
+            report["category_skipped"] += 1
             continue
 
         matched = match_keywords(post, keywords)
         if not matched:
+            report["keyword_skipped"] += 1
             continue
 
         if store.has_seen(post):
+            report["seen_skipped"] += 1
             continue
 
         detailed_post = enrich_post(post, source)
         notify(detailed_post, matched, notifiers)
         store.mark_seen(detailed_post)
-        hit_count += 1
+        report["matched_count"] += 1
+        report["matched_post_ids"].append(detailed_post.source_id or "")
 
-    print(f"[\u672c\u8f6e\u68c0\u67e5\u5b8c\u6210] \u5171\u62c9\u53d6 {len(posts)} \u6761\u5e16\u5b50\uff0c\u65b0\u589e\u547d\u4e2d {hit_count} \u6761\u3002")
-    return hit_count
+    print(
+        f"[\u672c\u8f6e\u68c0\u67e5\u5b8c\u6210] "
+        f"\u5171\u62c9\u53d6 {report['total_posts']} \u6761\u5e16\u5b50\uff0c"
+        f"\u65b0\u589e\u547d\u4e2d {report['matched_count']} \u6761\uff0c"
+        f"\u5206\u7c7b\u8fc7\u6ee4 {report['category_skipped']} \u6761\uff0c"
+        f"\u5173\u952e\u8bcd\u672a\u547d\u4e2d {report['keyword_skipped']} \u6761\uff0c"
+        f"\u5df2\u901a\u77e5\u8fc7 {report['seen_skipped']} \u6761\u3002"
+    )
+    return report
+
+
+def _write_report(status: str, report: Dict[str, Any] | None = None, error: str = "") -> None:
+    path = os.environ.get("MONITOR_REPORT_PATH", "").strip()
+    if not path:
+        return
+
+    payload: Dict[str, Any] = {
+        "status": status,
+        "error": error,
+    }
+    if report:
+        payload.update(report)
+
+    report_path = Path(path)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def main() -> int:
@@ -69,9 +110,11 @@ def main() -> int:
 
     if args.once:
         try:
-            run_once(str(config_path))
+            report = run_once(str(config_path))
+            _write_report("success", report)
             return 0
         except Exception:
+            _write_report("error", error=traceback.format_exc())
             traceback.print_exc()
             return 1
 
@@ -83,13 +126,15 @@ def main() -> int:
 
     while True:
         try:
-            run_once(str(config_path))
+            report = run_once(str(config_path))
+            _write_report("success", report)
             consecutive_failures = 0
         except KeyboardInterrupt:
             print("\n[\u901a\u77e5\u52a9\u624b\u5df2\u505c\u6b62]")
             return 0
         except Exception as exc:
             consecutive_failures += 1
+            _write_report("error", error=traceback.format_exc())
             print(f"[\u68c0\u67e5\u5931\u8d25] \u7b2c {consecutive_failures} \u6b21\u8fde\u7eed\u5931\u8d25: {exc}")
             if consecutive_failures >= 3:
                 print("[\u5efa\u8bae] \u8bf7\u4f18\u5148\u68c0\u67e5 Cookie \u662f\u5426\u5931\u6548\uff0c\u5e76\u91cd\u65b0\u6293\u5305\u66f4\u65b0\u914d\u7f6e\u3002")

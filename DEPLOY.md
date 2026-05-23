@@ -103,6 +103,33 @@ d8e523e9629c4d21add0fd60f5a27427
 - 如果运行成功但没通知，先看这 5 分钟内是否真的有新帖
 - 如果重复通知，通常是 Actions 缓存没有命中，导致 `data/state.db` 没恢复
 
+### GitHub 版建议怎么看结果
+
+每次 workflow 运行后，可以直接看两个地方：
+
+1. `Summary`
+   里面会有一段 `Monitor Report`
+2. `Artifacts`
+   会有 `runtime-state`
+
+`Monitor Report` 会告诉你：
+
+- `Total posts`
+- `New matches`
+- `Category skipped`
+- `Keyword skipped`
+- `Seen skipped`
+- `Matched post IDs`
+
+这几项的判断方式很直接：
+
+- `New matches = 0` 且 `Seen skipped = 0`
+  说明这轮没抓到符合条件的新帖
+- `New matches = 0` 且 `Seen skipped > 0`
+  说明这轮抓到了相关帖子，但被判重了
+- `status = error`
+  说明这轮请求或运行直接失败了
+
 ## 方案一：Linux 云服务器
 
 适合长期稳定运行，最接近你现在本地这套逻辑。

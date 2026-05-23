@@ -37,7 +37,15 @@ jobs:
           python tools/build_github_actions_config.py
 
       - name: Run monitor once
+        env:
+          MONITOR_REPORT_PATH: data/monitor_report.json
         run: python main.py --config config.generated.json --once
+
+      - name: Write workflow summary
+        if: always()
+        env:
+          MONITOR_REPORT_PATH: data/monitor_report.json
+        run: python tools/render_monitor_summary.py >> $GITHUB_STEP_SUMMARY
 
       - name: Upload runtime state
         if: always()
@@ -45,6 +53,7 @@ jobs:
         with:
           name: runtime-state
           path: |
+            data/monitor_report.json
             data/state.db
             data/session.json
           if-no-files-found: ignore
