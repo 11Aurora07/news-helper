@@ -63,6 +63,19 @@ python main.py --config config.sample.json --once
 python main.py --config config.sample.json
 ```
 
+### 4. 启动 Web 管理界面
+
+```powershell
+pip install -r requirements.txt
+python -m webui.serve
+```
+
+打开：
+
+```text
+http://127.0.0.1:8000
+```
+
 ## Fiddler 辅助脚本
 
 如果你已经装好了 Fiddler 和微信，可以直接运行：

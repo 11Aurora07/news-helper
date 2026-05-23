@@ -10,10 +10,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 from monitor.config import load_config
-from monitor.matcher import match_categories, match_keywords
-from monitor.notifier import notify
-from monitor.sources import enrich_post, fetch_posts
-from monitor.store import SeenStore
+from monitor.runtime import run_cycle
 
 
 def parse_args() -> argparse.Namespace:
@@ -33,46 +30,8 @@ def parse_args() -> argparse.Namespace:
 
 def run_once(config_path: str) -> Dict[str, Any]:
     config = load_config(config_path)
-    store = SeenStore("data/state.db")
-    keywords = config["keywords"]
-    categories = config.get("categories", [])
-    source = config["source"]
-    notifiers = config.get("notifiers", {})
-
-    posts = fetch_posts(source)
-    report: Dict[str, Any] = {
-        "config_path": config_path,
-        "total_posts": len(posts),
-        "category_skipped": 0,
-        "keyword_skipped": 0,
-        "seen_skipped": 0,
-        "detail_checked": 0,
-        "matched_count": 0,
-        "matched_post_ids": [],
-        "categories": categories,
-        "keywords": keywords,
-    }
-
-    for post in posts:
-        if not match_categories(post, categories):
-            report["category_skipped"] += 1
-            continue
-
-        if store.has_seen(post):
-            report["seen_skipped"] += 1
-            continue
-
-        detailed_post = enrich_post(post, source)
-        report["detail_checked"] += 1
-        matched = match_keywords(detailed_post, keywords)
-        if not matched:
-            report["keyword_skipped"] += 1
-            continue
-
-        notify(detailed_post, matched, notifiers)
-        store.mark_seen(detailed_post)
-        report["matched_count"] += 1
-        report["matched_post_ids"].append(detailed_post.source_id or "")
+    report = run_cycle(config, seen_db_path="data/state.db")
+    report["config_path"] = config_path
 
     print(
         f"[\u672c\u8f6e\u68c0\u67e5\u5b8c\u6210] "

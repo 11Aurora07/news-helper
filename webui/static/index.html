@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>通知助手控制台</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <div id="toast" class="toast" hidden></div>
+
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Mobile Console</p>
+          <h1>通知助手</h1>
+          <p class="hero-copy">在手机上调整关键词、查看最新命中、手动触发监控。</p>
+        </div>
+        <div class="hero-actions">
+          <button id="refreshBtn" class="secondary">刷新状态</button>
+          <button id="testNotifyBtn" class="secondary">测试通知</button>
+          <button id="runBtn">立即检查</button>
+        </div>
+      </section>
+
+      <section id="riskBanner" class="risk-banner" hidden></section>
+
+      <section class="grid">
+        <article class="card status-card">
+          <h2>运行状态</h2>
+          <div id="statusGrid" class="status-grid"></div>
+        </article>
+
+        <article class="card">
+          <h2>监控设置</h2>
+          <form id="settingsForm" class="form">
+            <label>
+              <span>启用监控</span>
+              <input type="checkbox" id="enabled" />
+            </label>
+            <label>
+              <span>轮询间隔（秒）</span>
+              <input type="number" id="pollInterval" min="15" step="5" />
+            </label>
+            <label>
+              <span>关键词（每行一个）</span>
+              <textarea id="keywords" rows="6"></textarea>
+            </label>
+            <label>
+              <span>分类（每行一个）</span>
+              <textarea id="categories" rows="4"></textarea>
+            </label>
+            <label>
+              <span>PushPlus Token</span>
+              <input type="text" id="pushplusToken" />
+            </label>
+            <label>
+              <span>Session Cookie 值</span>
+              <input type="text" id="sessionCookie" />
+            </label>
+            <details class="advanced">
+              <summary>高级接口配置</summary>
+              <label>
+                <span>列表抓取条数 pageSize</span>
+                <input type="number" id="pageSize" min="1" max="200" />
+              </label>
+              <label>
+                <span>PushPlus Topic</span>
+                <input type="text" id="pushplusTopic" />
+              </label>
+            </details>
+            <button type="submit">保存设置</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="grid bottom-grid">
+        <article class="card">
+          <div class="section-head">
+            <h2>最近命中</h2>
+            <input id="hitSearch" class="compact-input" type="text" placeholder="搜索标题 / 联系方式 / 关键词" />
+          </div>
+          <div id="hitsList" class="list"></div>
+        </article>
+        <article class="card">
+          <h2>运行历史</h2>
+          <div id="runsList" class="list"></div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

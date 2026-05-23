@@ -1,0 +1,17 @@
+[Unit]
+Description=Notify Helper Web Console
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/notify-helper
+Environment=HOST=0.0.0.0
+Environment=PORT=8000
+ExecStart=/usr/bin/python3 -m webui.serve
+Restart=always
+RestartSec=10
+User=root
+
+[Install]
+WantedBy=multi-user.target
